@@ -1,0 +1,26 @@
+#!/bin/sh
+
+. _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/include
+
+_MODULE=chmod
+_TYPE=d
+
+_chmod() {
+  for _CHMOD_ in $(find $1 -type f)
+  do
+    . $_CHMOD_
+    chmod $options $mode $path
+
+    unset mode path options
+  done
+}
+
+for _CHMOD_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
+   |xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE\
+   |/usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)")
+do
+  _chmod $_CHMOD_PATH
+  _HAS_RUN=1
+done
+
+_check_run

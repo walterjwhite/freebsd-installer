@@ -1,0 +1,30 @@
+#!/bin/sh
+
+_target_file() {
+	_TARGET_FILE=$1
+	echo -e "# target: $_TARGET_FILE"
+}
+
+_key_value() {
+	local _SOURCE_DIRECTORY=$1
+
+	mkdir -p $(dirname $_TARGET_FILE)
+
+  echo -e "###\n#Writing Key/Value: $_SOURCE_DIRECTORY"
+
+  for _KEY_VALUE_FILE in $(find $_SOURCE_DIRECTORY -type f)
+  do
+	  for _LINE in $(/usr/local/bin/grep -Pv "(^#|^$)" $_KEY_VALUE_FILE)
+	  do
+			_KEY=$(echo -e $_LINE | sed -e "s/=.*$//")
+			_VALUE=$(echo -e $_LINE | sed -e "s/^.*=//")
+
+			if [ -e $_TARGET_FILE ]
+			then
+				gsed -i "/^$_KEY=/d" $_TARGET_FILE
+			fi
+
+			echo -e "$_KEY=$_VALUE" >> $_TARGET_FILE
+	  done
+  done
+}

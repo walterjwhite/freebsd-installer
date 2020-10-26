@@ -1,0 +1,11 @@
+#!/bin/sh
+
+_go() {
+	echo "Installing $_PACKAGE"
+	GOPATH=$_ROOT/usr/local go get $_PACKAGE
+}
+
+for _PACKAGE in $(/usr/local/bin/grep -Pv "(^$|^#)" $1)
+do
+	_go
+done

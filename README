@@ -1,0 +1,3 @@
+TODO:
+1. modify app-install to take an optional ROOT argument (so we can install files on another ROOT FS)
+2. need to install bsdsetup script and helpers to new root

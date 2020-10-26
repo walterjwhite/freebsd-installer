@@ -1,0 +1,24 @@
+#!/bin/sh
+
+_ROOT_SUPPORTED=0
+
+if [ "$_DEBUG" ]
+then
+	set -x
+fi
+
+if [ -n "$_ROOT" ]
+then
+	#chroot $_ROOT
+	echo -e "chroot $_ROOT"
+fi
+
+_PATCH_PATH=$(echo $1 | sed -e "s/\.patch.*/.patch/")
+. $1
+
+if [ -n "$_ROOT" ]
+then
+	# exit chroot
+
+	exit
+fi

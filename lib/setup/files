@@ -1,0 +1,17 @@
+#!/bin/sh
+
+. _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/include
+
+_MODULE=files
+_TYPE=d
+
+_FILE_ROOT=/
+if [ -n "$_ROOT" ]
+then
+  _FILE_ROOT=$_ROOT
+fi
+
+_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
+  |xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE\
+  |/usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)"\
+  |xargs -L 1 -I _PATH_ rsync -lmrt _PATH_/ $_FILE_ROOT

@@ -1,0 +1,51 @@
+#!/bin/sh
+
+_ROOT_SUPPORTED=0
+
+. _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/include
+
+_ORIGINAL_IFS=$IFS
+IFS=$'\n'
+
+_MODULE=links
+_TYPE=d
+
+_link() {
+  echo -e "###\n# Linking: " $1
+
+  for _LINK_FILE in $(find $1 -type f)
+  do
+	  . $_LINK_FILE
+
+	  for _TARGET in $targets}
+	  do
+		echo -e "ln -sf $path -> $_TARGET"
+
+		_PARENT=$(dirname $_TARGET)
+		if [ ! -e $path ]
+		then
+			echo -e "$path does NOT exist"
+			continue
+		elif [ ! -e $_PARENT ]
+		then
+			#echo -e "Parent Directory $_PARENT does NOT exist"
+			#continue
+			mkdir -p $_PARENT
+		fi
+
+		ln -sf $path $_TARGET
+	  done
+  done
+}
+
+for _LINK_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
+  |xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE\
+  |/usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)")
+do
+  _link $_LINK_PATH
+  _HAS_RUN=1
+done
+
+IFS=$_ORIGINAL_IFS
+
+_check_run

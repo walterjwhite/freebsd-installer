@@ -1,0 +1,6 @@
+#!/bin/sh
+
+. _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/include
+
+. _LIBRARY_PATH_/_APPLICATION_NAME_/list/downloads\
+	|xargs -L 1 -I _DOWNLOAD_FILE_ _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/download _DOWNLOAD_FILE_

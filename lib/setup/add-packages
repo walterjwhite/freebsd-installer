@@ -1,0 +1,17 @@
+#!/bin/sh
+
+_ROOT_SUPPORTED=0
+. _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/include
+
+_install() {
+  pkg install -y $@
+}
+
+_PACKAGES=$(_LIBRARY_PATH_/_APPLICATION_NAME_/list/packages)
+
+if [ -z "$_PACKAGES" ]
+then
+  echo -e "No packages to install"
+else
+  _install $_PACKAGES
+fi

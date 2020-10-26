@@ -1,0 +1,6 @@
+#!/bin/sh
+
+. _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/include
+. _LIBRARY_PATH_/_APPLICATION_NAME_/list/run\
+	|basename-sort\
+	|xargs -L 1 -I _RUN_SCRIPT_ _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/run _RUN_SCRIPT_
