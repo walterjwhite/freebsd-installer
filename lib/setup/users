@@ -19,16 +19,21 @@ _add() {
   do
 	. $_USER_PATH_
 
-	echo -e "###\n#Add User: $1 $username"
+	if [ "root" != "$username" ]
+	then
+		echo -e "###\n#Add User: $1 $username"
 
-	_OPTIONS="-n $username -m"
+		_OPTIONS="-n $username -m"
 
-	_add_argument "-g" "$gid"
-	_add_argument "-G" "$grouplist"
-	_add_argument "-s" "$shell"
-	_add_argument "-u" "$uid"
+		_add_argument "-g" "$gid"
+		_add_argument "-G" "$grouplist"
+		_add_argument "-s" "$shell"
+		_add_argument "-u" "$uid"
 
-	pw useradd $_OPTIONS
+		pw useradd $_OPTIONS
+	else
+		chsh -s "$shell"
+	fi
 
 	# set password
 	if [ -n "$password" ]

@@ -1,33 +1,22 @@
 #!/bin/sh
 
-if [ -z "$NET" ]
+_require "$NET" "NET is required (ie. msk0)" 1
+ifconfig $NET 2>&1 > /dev/null
+if [ "$?" -gt "0" ]
 then
-	exitWithError "NET is required (ie. msk0)" 1
-else
-	ifconfig $NET 2>&1 > /dev/null
-	if [ "$?" -gt "0" ]
-	then
-		exitWithError "$NET does not appear to exist" 2
-	fi
+	exitWithError "$NET does not appear to exist" 2
 fi
 
-if [ -z "$DEV" ]
+_require "$DEV" "DEV is required (ie. ada0)" 3
+_require "$DEV_NAME" "DEV_NAME is required (ie. 250.5 - NOTE: device will automatically be prefixed with 'z_')" 4
+_INCORRECT_PREFIX=$(echo $DEV_NAME | grep -c ^z_)
+if [ "$_INCORRECT_PREFIX" -gt "0" ]
 then
-	exitWithError "DEV is required (ie. ada0)" 3
+	DEV_NAME=$(echo $DEV_NAME | sed -e "s/^z_//")
 fi
 
-if [ -z "$DEV_NAME" ]
-then
-	exitWithError "DEV_NAME is required (ie. 250.5 - NOTE: device will automatically be prefixed with 'z_')" 4
-else
-	_INCORRECT_PREFIX=$(echo $DEV_NAME | grep -c ^z_)
-	if [ "$_INCORRECT_PREFIX" -gt "0" ]
-	then
-		DEV_NAME=$(echo $DEV_NAME | sed -e "s/^z_//")
-	fi
-fi
+_require "$HOSTNAME" "HOSTNAME is required (ie. acer-router)" 5
 
-if [ -z "$HOSTNAME" ]
-then
-	exitWithError "HOSTNAME is required (ie. acer-router)" 5
-fi
+_require "$GIT" "GIT is required (ie. github.com/walterjwhite/freebsd-base-install)" 6
+_require "$BRANCH" "BRANCH is required (ie. workstation)" 7
+

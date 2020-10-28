@@ -1,29 +1,17 @@
 #!/bin/sh
-sysrc ifconfig_${NET}=DHCP
 
-# enable this so we can remotely configure (if needed)
-sysrc sshd_enable=YES
+mkdir -p /var/log/walterjwhite
 
-echo "#####"                                             >> /etc/ssh/sshd_config
-echo "# temporarily enable root logins ..."              >> /etc/ssh/sshd_config
-echo "# this will be reconfigured with the next process" >> /etc/ssh/sshd_config
-
-echo "PermitRootLogin yes"                 >> /etc/ssh/sshd_config
-echo "MaxAuthTries 3"                      >> /etc/ssh/sshd_config
-echo "PasswordAuthentication yes"          >> /etc/ssh/sshd_config
-echo "ChallengeResponseAuthentication yes" >> /etc/ssh/sshd_config
-
+# TODO: make this optional
 # required for setting up base packages
 dhclient $NET
 
-# bootstrap
-# these tools are used later by the bsdsetup program
-pkg install -y bash beadm git gnugrep gsed rsync
-
-# set the root password
-# TODO: install expect (above)
-# capture requested root password and pipe in here
-passwd root 2>&1
+# bootstrap - required tools for subsequent patches
+pkg install -y beadm git gnugrep gsed rsync 2>&1 > /var/log/walterjwhite/0.bootstrap
 
 # configure hostname
-echo "hostname=${HOSTNAME}" >> /etc/rc.conf
+echo "hostname=${HOSTNAME}" >> /etc/rc.conf.hostname
+
+# configure the system
+PATH=$PATH:/usr/local/bin:/usr/local/sbin
+/usr/local/bin/bsdsetup -b=$BRANCH $GIT

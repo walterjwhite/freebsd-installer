@@ -12,22 +12,30 @@ trap _cleanup INT
 for _ARG in $@
 do
   case $_ARG in
-    -u)
-      _is_default=$(beadm list | grep N | grep -c ^default)
-      if [ "$_is_default" -eq "0" ]
-      then
-        _ beadm activate default
-        _ reboot
-      else
-        echo "default BE is already activated, continuiing"
-      fi
+    # NOT supported presently
+    # -u)
+    #   _is_default=$(beadm list | grep N | grep -c ^default)
+    #   if [ "$_is_default" -eq "0" ]
+    #   then
+    #     _ beadm activate default
+    #     _ reboot
+    #   else
+    #     echo "default BE is already activated, continuiing"
+    #   fi
 
-      ;;
+    #   ;;
     -b=*)
       _BRANCH="${_ARG#*=}"
       ;;
     *)
       _SYSTEM_REPOSITORY_PATH=$(mktemp -d)
+
+      # bypass the host checking (to avoid timeouts)
+      #ssh -o "StrictHostKeyChecking no" $(echo $_ARG | sed -e "s/\:.*//")
+      #exit
+      mkdir ~/.ssh
+      echo "StrictHostKeyChecking no" >> ~/.ssh/config
+
       git clone $_ARG $_SYSTEM_REPOSITORY_PATH
 
       cd $_SYSTEM_REPOSITORY_PATH

@@ -10,12 +10,14 @@ _key_value() {
 
 	mkdir -p $(dirname $_TARGET_FILE)
 
-  echo -e "###\n#Writing Key/Value: $_SOURCE_DIRECTORY"
+	echo -e "###\n#Writing Key/Value: $_SOURCE_DIRECTORY"
 
-  for _KEY_VALUE_FILE in $(find $_SOURCE_DIRECTORY -type f)
-  do
-	  for _LINE in $(/usr/local/bin/grep -Pv "(^#|^$)" $_KEY_VALUE_FILE)
-	  do
+	for _KEY_VALUE_FILE in $(find $_SOURCE_DIRECTORY -type f)
+	do
+		for _LINE in $(/usr/local/bin/grep -Pv "(^#|^$)" $_KEY_VALUE_FILE)
+		do
+	#	  	sysrc -f $_TARGET_FILE $_LINE
+
 			_KEY=$(echo -e $_LINE | sed -e "s/=.*$//")
 			_VALUE=$(echo -e $_LINE | sed -e "s/^.*=//")
 
@@ -25,6 +27,6 @@ _key_value() {
 			fi
 
 			echo -e "$_KEY=$_VALUE" >> $_TARGET_FILE
-	  done
-  done
+		done
+	done
 }

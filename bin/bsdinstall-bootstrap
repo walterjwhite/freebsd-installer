@@ -16,13 +16,6 @@ trap _cleanup INT 0 1 2 3 4
 # bring network device up so dhclient will work later
 ifconfig $NET up
 
-bsdinstall script $_INSTALLATION_SCRIPT
-
-# copy bin/lib to ROOT dir so we can reboot and use it immmediately
-tar cpf - /usr/local/walterjwhite | tar xpf - -C /mnt
-while read _FILE
-do
-	cp /usr/local/bin/$_FILE /mnt/usr/local/bin
-done < /usr/local/walterjwhite/freebsd-installer/.files
+bsdinstall script.walterjwhite $_INSTALLATION_SCRIPT
 
 exitSuccess "####\nInstallation finished, please remove USB media and reboot\n\n\n\n"
