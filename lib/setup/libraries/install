@@ -39,11 +39,6 @@ _complete() {
   _ touch $_CONFIGURATION_DIRECTORY/$1
 }
 
-_snapshot() {
-  _ beadm create $_SYSTEM_HASH.$BRANCH
-  _ beadm activate $_SYSTEM_HASH.$BRANCH
-}
-
 _run_modules() {
   _INDEX=2
 

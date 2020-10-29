@@ -12,6 +12,23 @@ pkg install -y beadm git gnugrep gsed rsync 2>&1 > /var/log/walterjwhite/0.boots
 # configure hostname
 echo "hostname=${HOSTNAME}" >> /etc/rc.conf.hostname
 
+###
+# setup temporary ssh key
+if [ -z "$_SKIP_SSH_SETUP" ]
+then
+    _SSH_KEY=~/.ssh/id_$_SSH_KEYTYPE
+    ssh-keygen -t $_SSH_KEYTYPE -N "" -f $_SSH_KEY
+
+    # start ssh agent
+    eval "$(ssh-agent -s)"
+    ssh-add $_SSH_KEY
+
+    ssh-copy-id $GIT_HOST
+fi
+
+# activate swap
+swapon $(grep swap /etc/fstab | awk {'print$1'})
+
 # configure the system
 PATH=$PATH:/usr/local/bin:/usr/local/sbin
 /usr/local/bin/bsdsetup -b=$BRANCH $GIT

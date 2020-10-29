@@ -1,0 +1,16 @@
+#!/bin/sh
+
+. _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/root
+
+_SYSTEM_HASH=$(git rev-parse HEAD)
+_BRANCH=$(head -1 /usr/local/etc/walterjwhite/system)
+
+# After we have finished installing the system, create a new Boot Environment so we can rollback any subsequent changes
+_ beadm create $_SYSTEM_HASH.$_BRANCH
+_ beadm activate $_SYSTEM_HASH.$_BRANCH
+
+_read_if "" "Y/n Reboot?" _REBOOT
+if [ "$_REBOOT" = "Y" ]
+then
+    reboot
+fi

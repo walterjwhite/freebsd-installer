@@ -20,3 +20,5 @@ _require "$HOSTNAME" "HOSTNAME is required (ie. acer-router)" 5
 _require "$GIT" "GIT is required (ie. github.com/walterjwhite/freebsd-base-install)" 6
 _require "$BRANCH" "BRANCH is required (ie. workstation)" 7
 
+GIT_HOST=$(echo $GIT | sed -e "s/\:.*$//")
+export GIT_HOST

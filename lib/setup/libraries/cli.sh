@@ -33,7 +33,7 @@ do
       # bypass the host checking (to avoid timeouts)
       #ssh -o "StrictHostKeyChecking no" $(echo $_ARG | sed -e "s/\:.*//")
       #exit
-      mkdir ~/.ssh
+      mkdir -p ~/.ssh
       echo "StrictHostKeyChecking no" >> ~/.ssh/config
 
       git clone $_ARG $_SYSTEM_REPOSITORY_PATH
