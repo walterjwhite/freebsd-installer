@@ -1,9 +1,5 @@
 #!/bin/sh
 
-_ROOT_SUPPORTED=0
-
-. _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/include
-
 _ORIGINAL_IFS=$IFS
 IFS=$'\n'
 
@@ -43,9 +39,6 @@ for _LINK_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
   |/usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)")
 do
   _link $_LINK_PATH
-  _HAS_RUN=1
 done
 
 IFS=$_ORIGINAL_IFS
-
-_check_run

@@ -1,11 +1,7 @@
 #!/bin/sh
 
-_ROOT_SUPPORTED=0
-
-. _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/include
-
-_MODULE=users
-_TYPE=d
+_MODULE=user
+_TYPE=f
 
 _add_argument() {
 	if [ -n "$2" ]
@@ -15,13 +11,11 @@ _add_argument() {
 }
 
 _add() {
-  for _USER_PATH_ in $(find $1 -type f)
-  do
-	. $_USER_PATH_
+	. $_USER_PATH
 
 	if [ "root" != "$username" ]
 	then
-		echo -e "###\n#Add User: $1 $username"
+		echo -e "###\n#Add User: $_USER_PATH: $username"
 
 		_OPTIONS="-n $username -m"
 
@@ -31,24 +25,24 @@ _add() {
 		_add_argument "-u" "$uid"
 
 		pw useradd $_OPTIONS
+
+		unset _OPTIONS
 	else
+		echo "# Setting shell to $shell for root"
 		chsh -s "$shell"
 	fi
 
 	# set password
 	if [ -n "$password" ]
 	then
+		echo "# Setting password $shell for $username"
 		chpass -p "$password" $username
 	fi
-  done
 }
 
-for _USERS_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
+for _USER_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
   |xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE\
   |/usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)")
 do
-  _add $_USERS_PATH
-	_HAS_RUN=1
+  _add
 done
-
-_check_run

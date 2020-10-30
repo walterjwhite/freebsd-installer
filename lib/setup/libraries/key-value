@@ -1,10 +1,5 @@
 #!/bin/sh
 
-_target_file() {
-	_TARGET_FILE=$1
-	echo -e "# target: $_TARGET_FILE"
-}
-
 _key_value() {
 	local _SOURCE_DIRECTORY=$1
 
@@ -14,10 +9,14 @@ _key_value() {
 
 	for _KEY_VALUE_FILE in $(find $_SOURCE_DIRECTORY -type f)
 	do
+		_PATCH_PATCH=$(echo $_KEY_VALUE_FILE\
+			| sed -e "s/\\.patch.*$//"\
+			| sed -e "s/\.\///"\
+			| sed -e "s/^patches\///")
+		
+		echo "# $_PATCH_PATCH" >> $_TARGET_FILE
 		for _LINE in $(/usr/local/bin/grep -Pv "(^#|^$)" $_KEY_VALUE_FILE)
 		do
-	#	  	sysrc -f $_TARGET_FILE $_LINE
-
 			_KEY=$(echo -e $_LINE | sed -e "s/=.*$//")
 			_VALUE=$(echo -e $_LINE | sed -e "s/^.*=//")
 
@@ -28,5 +27,7 @@ _key_value() {
 
 			echo -e "$_KEY=$_VALUE" >> $_TARGET_FILE
 		done
+
+		echo "" >> $_TARGET_FILE
 	done
 }

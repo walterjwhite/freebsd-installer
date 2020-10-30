@@ -10,5 +10,3 @@ export ZFSBOOT_GELI_ENCRYPTION=yes
 export ZFSBOOT_DISKS=${DEV}
 
 export nonInteractive=YES
-
-export _SSH_KEYTYPE=ecdsa

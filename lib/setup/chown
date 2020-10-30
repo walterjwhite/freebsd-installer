@@ -1,7 +1,5 @@
 #!/bin/sh
 
-. _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/include
-
 _MODULE=chown
 _TYPE=d
 
@@ -20,7 +18,4 @@ for _CHOWN_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
    |/usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)")
 do
   _chown $_CHOWN_PATH
-  _HAS_RUN=1
 done
-
-_check_run

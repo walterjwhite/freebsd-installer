@@ -145,8 +145,9 @@ f_isset ZFSBOOT_DATASETS || ZFSBOOT_DATASETS="
 	/$ZFSBOOT_BEROOT_NAME				mountpoint=none
 	/$ZFSBOOT_BEROOT_NAME/$ZFSBOOT_BOOTFS_NAME	mountpoint=/
 
+	# use tmpfs
 	# Compress /tmp, allow exec but not setuid
-	/tmp		mountpoint=/tmp,exec=on,setuid=off
+	#/tmp		mountpoint=/tmp,exec=on,setuid=off
 
 	# Don't mount /usr so that 'base' files go to the BEROOT
 	/usr		mountpoint=/usr,canmount=off

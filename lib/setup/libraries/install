@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # extract content via tarball OR git clone
-_CONFIGURATION_DIRECTORY=$_ROOT/usr/local/etc/walterjwhite/system-configuration/status
-_LOG_DIRECTORY=$_ROOT/var/log/walterjwhite
-_SYSTEM_IDENTIFICATION=$_ROOT/usr/local/etc/walterjwhite/system
+_CONFIGURATION_DIRECTORY=/usr/local/etc/walterjwhite/system-configuration/status
+_LOG_DIRECTORY=/var/log/walterjwhite
+_SYSTEM_IDENTIFICATION=/usr/local/etc/walterjwhite/system
 
 mkdir -p $_CONFIGURATION_DIRECTORY $_LOG_DIRECTORY $(dirname $_SYSTEM_IDENTIFICATION)
 
@@ -15,7 +15,13 @@ _run() {
     return
   fi
 
+  if [ -z "$MODULES_ERRORS_ARE_FATAL" ]
+  then
+    WARN_ON_ERROR=1
+  fi
+
   _ $2 > $_LOG_DIRECTORY/$1 2>&1
+  unset WARN_ON_ERROR
 
   _RETURN=$?
   case $_RETURN in

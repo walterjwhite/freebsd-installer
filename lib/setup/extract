@@ -1,6 +1,5 @@
 #!/bin/sh
 
-. _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/include
 . _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/key-value
 
 _ORIGINAL_IFS=$IFS
@@ -41,7 +40,7 @@ _do_extract() {
 		esac
 
 		# ensure target parent directory exists
-		local _target_parent=$_ROOT/$(dirname $_TARGET)
+		local _target_parent=/$(dirname $_TARGET)
 
 		if [ -n "$_CLEAN" ]
 		then
@@ -55,9 +54,9 @@ _do_extract() {
 		fi
 
 		mkdir -p $_target_parent
-		mv /tmp/"$_CONTENTS" $_ROOT/$_TARGET
+		mv /tmp/"$_CONTENTS" /$_TARGET
 
-		ls -al $_ROOT/$_TARGET
+		ls -al /$_TARGET
 		rm -rf /tmp/"$_CONTENTS"
 
 		unset _SOURCE _CLEAN _TARGET _CONTENTS
@@ -71,9 +70,6 @@ for _EXTRACT_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
   |/usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)")
 do
   _do_extract $_EXTRACT_PATH
-	_HAS_RUN=1
 done
 
 IFS=$_ORIGINAL_IFS
-
-_check_run

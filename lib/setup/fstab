@@ -1,0 +1,19 @@
+#!/bin/sh
+
+_MODULE=fstab
+_TYPE=f
+
+for _FSTAB_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
+  |xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE\
+  |/usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)")
+do
+  _PATCH_NAME=$(echo $_FSTAB_PATH\
+    | /usr/local/bin/grep -Po "^.*.\.patch"\
+    | sed -e "s/^\.\///"\
+    | sed -e "s/\.patch$//"\
+    | sed -e "s/^patches\///")
+
+  echo "# $_PATCH_NAME" >> /etc/fstab
+  cat $_FSTAB_PATH      >> /etc/fstab
+  echo ""               >> /etc/fstab
+done

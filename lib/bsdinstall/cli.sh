@@ -22,3 +22,8 @@ _require "$BRANCH" "BRANCH is required (ie. workstation)" 7
 
 GIT_HOST=$(echo $GIT | sed -e "s/\:.*$//")
 export GIT_HOST
+
+if [ -z "$_SSH_KEYTYPE" ]
+then
+	_SSH_KEYTYPE=ecdsa
+fi

@@ -88,6 +88,9 @@ f_dprintf "Began Installation at %s" "$( date )"
 rm -rf $BSDINSTALL_TMPETC
 mkdir $BSDINSTALL_TMPETC
 
+# force /etc/resolv.conf to be written (symlink forces it to $BSDINSTALL_TMPETC ...)
+resolvconf -u
+
 split -a 2 -p '^#!.*' "$SCRIPT" /tmp/bsdinstall-installscript-
 
 . /tmp/bsdinstall-installscript-aa
@@ -131,16 +134,15 @@ do
 	cp /usr/local/bin/$_FILE $BSDINSTALL_CHROOT/usr/local/bin
 done < /usr/local/walterjwhite/freebsd-installer/.files
 
+# install SSH key
+mkdir -p $BSDINSTALL_CHROOT/root/.ssh
+cp $_SSH_KEY $_SSH_KEY.pub $BSDINSTALL_CHROOT/root/.ssh
+
 # Configure bootloader if needed
 bsdinstall bootconfig
 
 # Finalize install
 bsdinstall config
-
-# Make sure networking is functional, if we can arrange that
-if [ ! -f $BSDINSTALL_CHROOT/etc/resolv.conf -a -f /etc/resolv.conf ]; then
-	cp /etc/resolv.conf $BSDINSTALL_CHROOT/etc/resolv.conf
-fi
 
 # Run post-install script
 if [ -f /tmp/bsdinstall-installscript-ab ]; then

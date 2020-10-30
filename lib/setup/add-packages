@@ -1,8 +1,5 @@
 #!/bin/sh
 
-_ROOT_SUPPORTED=0
-. _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/include
-
 _install() {
   pkg install -y $@
 }

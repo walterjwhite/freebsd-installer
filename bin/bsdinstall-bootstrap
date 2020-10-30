@@ -1,20 +1,18 @@
 #!/bin/sh
 
-. _LIBRARY_PATH_/_APPLICATION_NAME_/bsdinstall/cli.sh
-
-_INSTALLATION_PATH=$(mktemp -d)
-
 _cleanup() {
 	rm -rf _INSTALLATION_PATH
 }
 
 trap _cleanup INT 0 1 2 3 4
 
+. _LIBRARY_PATH_/_APPLICATION_NAME_/bsdinstall/cli.sh
+. _LIBRARY_PATH_/_APPLICATION_NAME_/bsdinstall/ssh-keys.sh
+
+_INSTALLATION_PATH=$(mktemp -d)
+
 # prepare install script
 . _LIBRARY_PATH_/_APPLICATION_NAME_/bsdinstall/bsdinstall.sh
-
-# bring network device up so dhclient will work later
-ifconfig $NET up
 
 bsdinstall script.walterjwhite $_INSTALLATION_SCRIPT
 
