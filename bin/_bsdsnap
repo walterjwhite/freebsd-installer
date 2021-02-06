@@ -10,7 +10,6 @@ _ beadm create $_SYSTEM_HASH.$_BRANCH
 _ beadm activate $_SYSTEM_HASH.$_BRANCH
 
 _read_if "" "Y/n Reboot?" _REBOOT
-if [ "$_REBOOT" = "Y" ]
-then
-    reboot
+if [ "$_REBOOT" = "Y" ]; then
+	reboot
 fi

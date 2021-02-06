@@ -1,6 +1,6 @@
 #!/bin/sh
 
-git branch --no-color --show-current   > $_SYSTEM_IDENTIFICATION
-git log --pretty=medium --no-color -1 >> $_SYSTEM_IDENTIFICATION
+git branch --no-color --show-current >$_SYSTEM_IDENTIFICATION
+git log --pretty=medium --no-color -1 >>$_SYSTEM_IDENTIFICATION
 
-echo "Configuration Date: $(date)"    >> $_SYSTEM_IDENTIFICATION
+echo "Configuration Date: $(date)" >>$_SYSTEM_IDENTIFICATION

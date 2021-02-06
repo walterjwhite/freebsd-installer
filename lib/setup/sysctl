@@ -10,11 +10,8 @@ _TYPE=d
 
 _TARGET_FILE=/etc/sysctl.conf
 
-for _SYSCTL_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
-  |xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE\
-  |/usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)")
-do
-  _key_value $_SYSCTL_PATH
+for _SYSCTL_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches | xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE | /usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)"); do
+	_key_value $_SYSCTL_PATH
 done
 
 IFS=$_ORIGINAL_IFS

@@ -1,5 +1,4 @@
 #!/bin/sh
 
-find . -type d\
-	| grep \\.patch$\
-	| sort
+find . -type d | grep \\.patch$ |
+	sort

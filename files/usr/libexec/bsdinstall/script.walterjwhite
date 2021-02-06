@@ -56,8 +56,7 @@ msg_installation_error="Installation Error!"
 
 ############################################################ FUNCTIONS
 
-error()
-{
+error() {
 	local file
 	f_getvar "$VAR_DEBUG_FILE#+" file
 	if [ "$file" ]; then
@@ -84,7 +83,7 @@ trap error EXIT
 SCRIPT="$1"
 shift
 
-f_dprintf "Began Installation at %s" "$( date )"
+f_dprintf "Began Installation at %s" "$(date)"
 rm -rf $BSDINSTALL_TMPETC
 mkdir $BSDINSTALL_TMPETC
 
@@ -94,7 +93,8 @@ resolvconf -u
 split -a 2 -p '^#!.*' "$SCRIPT" /tmp/bsdinstall-installscript-
 
 . /tmp/bsdinstall-installscript-aa
-: ${DISTRIBUTIONS="kernel.txz base.txz"}; export DISTRIBUTIONS
+: ${DISTRIBUTIONS="kernel.txz base.txz"}
+export DISTRIBUTIONS
 export BSDINSTALL_DISTDIR
 
 # Re-initialize a new log if preamble changed BSDINSTALL_LOG
@@ -102,7 +102,7 @@ if [ "$BSDINSTALL_LOG" != "${debugFile#+}" ]; then
 	export debugFile="$BSDINSTALL_LOG"
 	f_quietly f_debug_init
 	# NB: Being scripted, let debug go to terminal for invalid debugFile
-	f_dprintf "Began Instalation at %s" "$( date )"
+	f_dprintf "Began Instalation at %s" "$(date)"
 fi
 
 # Make partitions
@@ -129,10 +129,9 @@ done
 # copy bsdsetup files
 tar cpf - /usr/local/walterjwhite | tar xpf - -C $BSDINSTALL_CHROOT
 mkdir -p $BSDINSTALL_CHROOT/usr/local/bin
-while read _FILE
-do
+while read _FILE; do
 	cp /usr/local/bin/$_FILE $BSDINSTALL_CHROOT/usr/local/bin
-done < /usr/local/walterjwhite/freebsd-installer/.files
+done </usr/local/walterjwhite/freebsd-installer/.files
 
 # install SSH key
 mkdir -p $BSDINSTALL_CHROOT/root/.ssh
@@ -161,7 +160,7 @@ else
 	bsdinstall umount
 fi
 
-f_dprintf "Installation Completed at %s" "$( date )"
+f_dprintf "Installation Completed at %s" "$(date)"
 
 trap - EXIT
 exit $SUCCESS

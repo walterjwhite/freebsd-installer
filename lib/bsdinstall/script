@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # configure hostname
-echo "hostname=${HOSTNAME}" >> /etc/rc.conf.hostname
+echo "hostname=${HOSTNAME}" >>/etc/rc.conf.hostname
 
 mkdir -p /var/log/walterjwhite
 
@@ -9,8 +9,8 @@ mkdir -p /var/log/walterjwhite
 swapon $(grep swap /etc/fstab | awk {'print$1'})
 
 # bootstrap - required tools for subsequent patches
-pkg install -y beadm git gnugrep gsed rsync 2>&1 > /var/log/walterjwhite/0.bootstrap
+pkg install -y beadm git gnugrep gsed rsync 2>&1 >/var/log/walterjwhite/0.bootstrap
 
 # configure the system
 PATH=$PATH:/usr/local/bin:/usr/local/sbin
-/usr/local/bin/bsdsetup -b=$BRANCH $GIT
+/usr/local/bin/_bsdsetup -b=$BRANCH $GIT

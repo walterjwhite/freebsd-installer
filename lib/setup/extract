@@ -9,8 +9,7 @@ _MODULE=extract
 _TYPE=d
 
 _do_extract() {
-	for _EXTRACT_FILE in $(find $1 -type f)
-	do
+	for _EXTRACT_FILE in $(find $1 -type f); do
 		echo -e "###\n# Extracting $_EXTRACT_FILE"
 
 		. $_EXTRACT_FILE
@@ -18,38 +17,36 @@ _do_extract() {
 		local _extension=$(echo "$_SOURCE" | /usr/local/bin/grep -Po "\\.(tar\\.gz|tar\\.bz2|tbz2|tgz|zip|tar\\.xz)$")
 
 		case $_extension in
-			".tar.gz"|".tgz")
-				tar zxf /tmp/downloads/$_SOURCE -C /tmp
-				;;
-			".zip")
-				unzip /tmp/downloads/$_SOURCE -q -d /tmp
-				;;
-			".tar.bz2"|".tbz2")
-				tar jxf /tmp/downloads/$_SOURCE -C /tmp
-				;;
-			".tar.xz")
-				_TAR=$(echo -e $_SOURCE | sed -e "s/\\.xz$//")
+		".tar.gz" | ".tgz")
+			tar zxf /tmp/downloads/$_SOURCE -C /tmp
+			;;
+		".zip")
+			unzip /tmp/downloads/$_SOURCE -q -d /tmp
+			;;
+		".tar.bz2" | ".tbz2")
+			tar jxf /tmp/downloads/$_SOURCE -C /tmp
+			;;
+		".tar.xz")
+			_TAR=$(echo -e $_SOURCE | sed -e "s/\\.xz$//")
 
-				xz -dc  /tmp/downloads/$_SOURCE > /tmp/$_TAR
-				tar xf /tmp/downloads/$_TAR -C /tmp
-				;;
-			*)
-				echo -e "WARNING - extension unsupported - $_extension $_SOURCE $_EXTRACT_FILE"
-				#exit 1
-				;;
+			xz -dc /tmp/downloads/$_SOURCE >/tmp/$_TAR
+			tar xf /tmp/downloads/$_TAR -C /tmp
+			;;
+		*)
+			echo -e "WARNING - extension unsupported - $_extension $_SOURCE $_EXTRACT_FILE"
+			#exit 1
+			;;
 		esac
 
 		# ensure target parent directory exists
 		local _target_parent=/$(dirname $_TARGET)
 
-		if [ -n "$_CLEAN" ]
-		then
+		if [ -n "$_CLEAN" ]; then
 			rm -rf $_CLEAN
 		fi
 
-		if [ -z "$_CONTENTS" ]
-		then
-      		cp /tmp/downloads/$_SOURCE /tmp/$_SOURCE
+		if [ -z "$_CONTENTS" ]; then
+			cp /tmp/downloads/$_SOURCE /tmp/$_SOURCE
 			_CONTENTS=$_SOURCE
 		fi
 
@@ -65,11 +62,8 @@ _do_extract() {
 	done
 }
 
-for _EXTRACT_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
-  |xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE\
-  |/usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)")
-do
-  _do_extract $_EXTRACT_PATH
+for _EXTRACT_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches | xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE | /usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)"); do
+	_do_extract $_EXTRACT_PATH
 done
 
 IFS=$_ORIGINAL_IFS

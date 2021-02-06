@@ -10,47 +10,44 @@ mkdir -p $_CONFIGURATION_DIRECTORY $_LOG_DIRECTORY $(dirname $_SYSTEM_IDENTIFICA
 export _CONFIGURATION_DIRECTORY=$_CONFIGURATION_DIRECTORY _LOG_DIRECTORY=$_LOG_DIRECTORY _SYSTEM_IDENTIFICATION=$_SYSTEM_IDENTIFICATION
 
 _run() {
-  if [ -e $_CONFIGURATION_DIRECTORY/$1 ]
-  then
-    return
-  fi
+	if [ -e $_CONFIGURATION_DIRECTORY/$1 ]; then
+		return
+	fi
 
-  if [ -z "$MODULES_ERRORS_ARE_FATAL" ]
-  then
-    WARN_ON_ERROR=1
-  fi
+	if [ -z "$MODULES_ERRORS_ARE_FATAL" ]; then
+		WARN_ON_ERROR=1
+	fi
 
-  _ $2 > $_LOG_DIRECTORY/$1 2>&1
-  unset WARN_ON_ERROR
+	_ $2 >$_LOG_DIRECTORY/$1 2>&1
+	unset WARN_ON_ERROR
 
-  _RETURN=$?
-  case $_RETURN in
-    0)
-      _complete $1 "Successfully completed - $_RETURN"
-      ;;
-    1)
-      _complete $1 "No activity performed - $_RETURN"
-      _ touch $_CONFIGURATION_DIRECTORY/$1
-      ;;
-    *)
-      echo "$1 - Other error - $_RETURN"
-      exit $_RETURN
+	_RETURN=$?
+	case $_RETURN in
+	0)
+		_complete $1 "Successfully completed - $_RETURN"
+		;;
+	1)
+		_complete $1 "No activity performed - $_RETURN"
+		_ touch $_CONFIGURATION_DIRECTORY/$1
+		;;
+	*)
+		echo "$1 - Other error - $_RETURN"
+		exit $_RETURN
 
-      ;;
-  esac
+		;;
+	esac
 }
 
 _complete() {
-  echo "$1 - $2"
-  _ touch $_CONFIGURATION_DIRECTORY/$1
+	echo "$1 - $2"
+	_ touch $_CONFIGURATION_DIRECTORY/$1
 }
 
 _run_modules() {
-  _INDEX=2
+	_INDEX=2
 
-  for _MODULE in $@
-  do
-    _run ${_INDEX}.${_MODULE} _LIBRARY_PATH_/_APPLICATION_NAME_/setup/${_MODULE}
-    _INDEX=$((_INDEX+1))
-  done
+	for _MODULE in $@; do
+		_run ${_INDEX}.${_MODULE} _LIBRARY_PATH_/_APPLICATION_NAME_/setup/${_MODULE}
+		_INDEX=$((_INDEX + 1))
+	done
 }

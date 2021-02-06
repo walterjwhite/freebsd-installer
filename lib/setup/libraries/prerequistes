@@ -3,17 +3,14 @@
 _exists() {
 	_ok=1
 
-	for _FILE_PATH in $@
-	do
-		if [ ! -e $_FILE_PATH ]
-		then
+	for _FILE_PATH in $@; do
+		if [ ! -e $_FILE_PATH ]; then
 			echo "$_FILE_PATH does NOT exist"
 			_ok=0
 		fi
 	done
 
-	if [ "$_ok" -ne "1" ]
-	then
+	if [ "$_ok" -ne "1" ]; then
 		exit 1
 	fi
 }

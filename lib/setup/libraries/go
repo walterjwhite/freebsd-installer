@@ -5,7 +5,6 @@ _go() {
 	GOPATH=/usr/local go get $_PACKAGE
 }
 
-for _PACKAGE in $(/usr/local/bin/grep -Pv "(^$|^#)" $1)
-do
+for _PACKAGE in $(/usr/local/bin/grep -Pv "(^$|^#)" $1); do
 	_go
 done

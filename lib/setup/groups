@@ -4,15 +4,12 @@ _MODULE=group
 _TYPE=f
 
 _add() {
-  	. $_GROUP_PATH
+	. $_GROUP_PATH
 
-  	echo -e "###\n#Add Group: $_GROUP_PATH $groupName $gid"
-  	pw groupadd -n $groupName -g $gid
+	echo -e "###\n#Add Group: $_GROUP_PATH $groupName $gid"
+	pw groupadd -n $groupName -g $gid
 }
 
-for _GROUP_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
-  |xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE\
-  |/usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)")
-do
-  _add
+for _GROUP_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches | xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE | /usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)"); do
+	_add
 done

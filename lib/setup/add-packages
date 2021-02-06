@@ -1,14 +1,13 @@
 #!/bin/sh
 
 _install() {
-  pkg install -y $@
+	pkg install -y $@
 }
 
 _PACKAGES=$(_LIBRARY_PATH_/_APPLICATION_NAME_/list/packages)
 
-if [ -z "$_PACKAGES" ]
-then
-  echo -e "No packages to install"
+if [ -z "$_PACKAGES" ]; then
+	echo -e "No packages to install"
 else
-  _install $_PACKAGES
+	_install $_PACKAGES
 fi

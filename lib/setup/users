@@ -4,8 +4,7 @@ _MODULE=user
 _TYPE=f
 
 _add_argument() {
-	if [ -n "$2" ]
-	then
+	if [ -n "$2" ]; then
 		_OPTIONS="$_OPTIONS $1 $2"
 	fi
 }
@@ -13,8 +12,7 @@ _add_argument() {
 _add() {
 	. $_USER_PATH
 
-	if [ "root" != "$username" ]
-	then
+	if [ "root" != "$username" ]; then
 		echo -e "###\n#Add User: $_USER_PATH: $username"
 
 		_OPTIONS="-n $username -m"
@@ -33,16 +31,12 @@ _add() {
 	fi
 
 	# set password
-	if [ -n "$password" ]
-	then
+	if [ -n "$password" ]; then
 		echo "# Setting password $shell for $username"
 		chpass -p "$password" $username
 	fi
 }
 
-for _USER_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
-  |xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE\
-  |/usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)")
-do
-  _add
+for _USER_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches | xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE | /usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)"); do
+	_add
 done

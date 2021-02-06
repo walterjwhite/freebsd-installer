@@ -10,11 +10,8 @@ _TYPE=d
 
 _TARGET_FILE=/boot/loader.conf
 
-for _BOOT_LOADER_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
-  |xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE\
-  |/usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)")
-do
-  _key_value $_BOOT_LOADER_PATH
+for _BOOT_LOADER_PATH in $(_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches | xargs -L 1 -I _PATCH_ find _PATCH_ -type $_TYPE | /usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)"); do
+	_key_value $_BOOT_LOADER_PATH
 done
 
 IFS=$_ORIGINAL_IFS
