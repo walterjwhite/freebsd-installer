@@ -10,18 +10,6 @@ trap _cleanup INT
 
 for _ARG in $@; do
 	case $_ARG in
-	# NOT supported presently
-	# -u)
-	#   _is_default=$(beadm list | grep N | grep -c ^default)
-	#   if [ "$_is_default" -eq "0" ]
-	#   then
-	#     _ beadm activate default
-	#     _ reboot
-	#   else
-	#     echo "default BE is already activated, continuiing"
-	#   fi
-
-	#   ;;
 	-b=*)
 		_BRANCH="${_ARG#*=}"
 		;;

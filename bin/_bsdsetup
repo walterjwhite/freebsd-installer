@@ -1,6 +1,5 @@
 #!/bin/sh
 
-. _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/root
 . _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/install
 
 . _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/cli.sh

@@ -13,6 +13,8 @@ if [ "$NET" ]; then
 		_SSH_KEY=/tmp/id_$_SSH_KEYTYPE
 		export _SSH_KEY
 
+		killall ssh-agent
+		rm -f ${_SSH_KEY}*
 		ssh-keygen -t $_SSH_KEYTYPE -N "" -f $_SSH_KEY
 
 		# start ssh agent

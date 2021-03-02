@@ -1,8 +1,6 @@
 #!/bin/sh
 
-if [ "$_DEBUG" ]; then
-	_PATCH_PATH=$(echo $1 | sed -e "s/\.patch.*/.patch/")
-	echo "Running $_PATCH_PATH"
-fi
+_PATCH_PATH=$(echo $1 | sed -e "s/\.patch.*/.patch/")
+echo "Running $1"
 
 . $1

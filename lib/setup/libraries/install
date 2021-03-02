@@ -31,15 +31,14 @@ _run() {
 		_ touch $_CONFIGURATION_DIRECTORY/$1
 		;;
 	*)
-		echo "$1 - Other error - $_RETURN"
-		exit $_RETURN
+		exitWithError "$1 - Other error - $_RETURN" $_RETURN
 
 		;;
 	esac
 }
 
 _complete() {
-	echo "$1 - $2"
+	info "$1 - $2"
 	_ touch $_CONFIGURATION_DIRECTORY/$1
 }
 

@@ -1237,8 +1237,8 @@ zfs_create_boot() {
 		# Load the AES-NI kernel module to accelerate encryption
 		#
 		f_eval_catch -d $funcname kldload "$KLDLOAD" "aesni"
-		if [ "$ZFS_PASSWORD" ]; then
-			pw_password="$ZFS_PASSWORD"
+		if [ "$GELI_PASSWORD" ]; then
+			pw_password="$GELI_PASSWORD"
 		else
 			# Prompt user for password (twice)
 			if ! msg_enter_new_password="$msg_geli_password" \

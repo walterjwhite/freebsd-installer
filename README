@@ -50,4 +50,4 @@ Instructions:
 
 7. invoke bsdinstall-boostrap
     /usr/local/bin/bsdinstall-bootstrap
-        NET, DEV, DEV_NAME, HOSTNAME, GIT, BRANCH, ZFS_PASSWORD (optional, to be renamed to GELI password or converted to OpenZFS)
+        NET, DEV, DEV_NAME, HOSTNAME, GIT, BRANCH, GELI_PASSWORD (optional, to be renamed to GELI password or converted to OpenZFS)
