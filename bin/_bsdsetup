@@ -8,6 +8,3 @@ _SYSTEM_HASH=$(git rev-parse HEAD)
 
 _run 1.system _LIBRARY_PATH_/_APPLICATION_NAME_/setup/libraries/scm-timestamp
 _run_modules add-packages downloads boot-loader sysctl rc files extract links fstab groups users go chown chmod run
-
-# create a system snapshot (to allow us to easily rollback later)
-/usr/local/bin/_bsdsnap
