@@ -1,0 +1,23 @@
+#!/bin/sh
+
+import bsdinstall
+
+printf '\n\n'
+_info "Installing FreeBSD (walterjwhite)"
+
+_cleanup_prior_installation
+
+_setup_dev_name_using_map
+
+_cli
+_get_geli_password
+_net
+_ssh_keys
+_setup
+
+_ENVIRONMENT_FILE=$_APPLICATION_PIPE_DIR/environment-pre-bsdinstall-$(date +%s) _environment_dump
+
+_NO_WRITE_STDERR=0
+bsdinstall script.walterjwhite $_INSTALLATION_SCRIPT $_CONF_INSTALL_LIBRARY_PATH/$_APPLICATION_NAME/bin/bootstrap &
+
+exit 0
