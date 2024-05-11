@@ -1,8 +1,0 @@
-#!/bin/sh
-
-_MODULE=downloads
-
-_LIBRARY_PATH_/_APPLICATION_NAME_/find/patches\
-	|xargs -L 1 -I _PATH_ find _PATH_ -type d\
-	|/usr/local/bin/grep -P "\\.patch/(${_MODULE}$|.*\\.${_MODULE}$)"\
-	|xargs -L 1 -I _PATH_ find _PATH_ -type f

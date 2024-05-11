@@ -1,0 +1,27 @@
+#!/bin/sh
+
+import bootstrap/module.sh
+
+anchor_name=$(printf '%s' $1 | tr '.' '_')
+anchor_file=$(find /usr/local/etc/walterjwhite/firewall/anchor/.data -type f -name $1)
+anchor_filename=$(basename $1)
+
+_PATCH_PATH=$(_module_get_patch_path $1)
+
+pf_anchor_schedule_file=$_PATCH_PATH/crontab/root/pf.$anchor_filename.schedule
+
+for anchor_schedule_line in $($_CONF_INSTALL_GNU_GREP -Pvh '^(#|$)' $1); do
+	anchor_schedule_start=$(printf '%s' "$anchor_schedule_line" | cut -f1 -d'|')
+	anchor_schedule_end=$(printf '%s' "$anchor_schedule_line" | cut -f2 -d'|')
+
+	mkdir -p $(dirname $pf_anchor_schedule_file)
+	_info "$anchor_name:$anchor_schedule_start -> $anchor_schedule_end"
+
+	if [ -n "$anchor_schedule_start" ]; then
+		printf '%s pfctl -a %s -f %s\n' "$anchor_schedule_start" $anchor_name $anchor_file >>$pf_anchor_schedule_file
+	fi
+	if [ -n "$anchor_schedule_end" ]; then
+		printf '%s pfctl -a %s -F all\n' "$anchor_schedule_end" $anchor_name >>$pf_anchor_schedule_file
+		printf '%s pfctl -a %s -F states\n' "$anchor_schedule_end" $anchor_name >>$pf_anchor_schedule_file
+	fi
+done

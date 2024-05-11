@@ -1,0 +1,10 @@
+#!/bin/sh
+
+import logs
+
+[ $# -gt 0 ] && {
+	_bsd_read_remote_logs $1
+	exit 0
+}
+
+_bsd_read_logs_locally

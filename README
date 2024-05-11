@@ -1,3 +1,54 @@
-TODO:
-1. modify app-install to take an optional ROOT argument (so we can install files on another ROOT FS)
-2. need to install bsdsetup script and helpers to new root
+What this does:
+    This scripts the BSD installation:
+    1. ZFS pool configuration
+    2. GELI password
+    3. system configuration
+        packages
+        files
+        chmod / chown
+        boot-loader
+        rc.conf
+        sysctl
+        groups
+        users
+        scripts (run)
+    4. updates the system using freebsd-update fetch install
+
+Requirements
+    1. network connectivity
+    2. git repository with system configuration (example to be posted)
+
+Why
+    Everything I do *MUST* be repeatable and I strive to not repeat myself.
+    Every knob can be traced to a "patch" and a reason why.
+    I can have a fully-configured, operational system quickly.
+
+Why not Boot Environments (BEs)?
+    BEs are a supplement and in fact I use BEs alongside this to rollback in the even of a failure that I cannot easily move forward
+
+
+Instructions:
+1. install "install" utility
+    git clone install ...
+    cd install
+    cp app-* /usr/local/sbin (or wherever your root dir is)
+    app-install
+
+2. download and install FreeBSD onto a USB drive
+    dd ...
+
+3. mount USB drive @ /mnt/usb
+
+4. get freebsd-installer
+    git clone freebsd-installer
+
+5. install freebsd-installer to USB
+    cd freebsd-installer
+    ROOT=/mnt/usb app-install
+    umount /mnt/usb
+
+6. boot to USB
+
+7. invoke bsdinstall-boostrap
+    /usr/local/bin/bsdinstall-bootstrap
+        net, dev, dev_name, hostname, git, branch, geli_password

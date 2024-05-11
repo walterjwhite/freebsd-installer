@@ -1,0 +1,5 @@
+#!/bin/sh
+
+_NO_WRITE_STDERR=0 _bsdinstall &
+
+exit 0

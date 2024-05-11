@@ -1,0 +1,29 @@
+#!/bin/sh
+
+if [ $# -lt 1 ]; then
+	_DEVICE=da0
+else
+	_DEVICE=$1
+	shift
+fi
+
+if [ $# -lt 1 ]; then
+	_RELEASE_VERSION=$(uname -r | sed -e 's/\-p.*//')
+	_IMAGE=$_CONF_INSTALL_APPLICATION_DATA_PATH/FreeBSD-$_RELEASE_VERSION-$_ARCHITECTURE-memstick.img
+else
+	_IMAGE=$1
+	shift
+fi
+
+_info "Copying image to $_DEVICE"
+dd if=$_IMAGE of=/dev/$_DEVICE bs=1M conv=sync status=progress || _error "Error writing FreeBSD image"
+
+_info "Resizing partition on $_DEVICE"
+gpart resize -i 2 $_DEVICE || _error "Error resizing partition:0"
+gpart resize -i 1 ${_DEVICE}s2 || _error "Error resizing partition:1"
+
+_info "Growing filesystem on $_DEVICE"
+yes yes | growfs /dev/${_DEVICE}s2a || _error "Error growing filesystem"
+
+_info "Preparing USB"
+_bsdinstall-prepare-usb || _error "Error preparing USB"

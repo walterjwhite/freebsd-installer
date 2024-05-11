@@ -1,0 +1,26 @@
+#!/bin/sh
+
+import bootstrap/module.sh
+
+table_name=$(printf '%s' $1 | tr '.' '_')
+table_file=$(find /usr/local/etc/walterjwhite/firewall/table/.data -type f -name $1)
+table_filename=$(basename $1)
+
+_PATCH_PATH=$(_module_get_patch_path $1)
+
+pf_table_schedule_file=$_PATCH_PATH/crontab/root/pf.$table_filename.schedule
+
+for table_schedule_line in $($_CONF_INSTALL_GNU_GREP -Pvh '^(#|$)' $1); do
+	table_schedule_start=$(printf '%s' "$table_schedule_line" | cut -f1 -d'|')
+	table_schedule_end=$(printf '%s' "$table_schedule_line" | cut -f2 -d'|')
+
+	mkdir -p $(dirname $pf_table_schedule_file)
+	_info "$table_name:$table_schedule_start -> $table_schedule_end"
+
+	if [ -n "$table_schedule_start" ]; then
+		printf '%s pfctl -t %s -T replace -f %s\n' "$table_schedule_start" $table_name $table_file >>$pf_table_schedule_file
+	fi
+	if [ -n "$table_schedule_end" ]; then
+		printf '%s pfctl -t %s -T flush\n' "$table_schedule_end" $table_name >>$pf_table_schedule_file
+	fi
+done

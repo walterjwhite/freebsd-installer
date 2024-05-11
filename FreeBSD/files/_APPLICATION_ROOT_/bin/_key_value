@@ -1,0 +1,24 @@
+#!/bin/sh
+
+import bootstrap/module.sh
+
+_TARGET_FILE=$1
+_SOURCE_FILE=$2
+_EDITOR_PROGRAM=$3
+
+mkdir -p $(dirname $_TARGET_FILE)
+
+_info "key/value: $_SOURCE_FILE"
+
+_PATCH_NAME=$(_module_get_patch_name $_SOURCE_FILE)
+
+printf '# %s\n' "$_PATCH_NAME" >>$_TARGET_FILE
+$_CONF_INSTALL_GNU_GREP -Pv "(^#|^$)" $_SOURCE_FILE | while read _LINE; do
+
+	_KEY=$(printf '%s' "$_LINE" | sed -e "s/=.*$//")
+	_VALUE=$(printf '%s' "$_LINE" | sed -e "s/^.*=//" | tr -d '"')
+
+	printf '%s="%s"\n' "$_KEY" "$_VALUE" >>$_TARGET_FILE
+done
+
+printf '\n' >>$_TARGET_FILE

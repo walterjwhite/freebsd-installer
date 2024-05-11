@@ -1,0 +1,32 @@
+_cli() {
+	_determine_network_interface
+
+	_require "$_CONF_FREEBSD_INSTALLER_NET" _CONF_FREEBSD_INSTALLER_NET
+	_require "$_CONF_FREEBSD_INSTALLER_DEV" _CONF_FREEBSD_INSTALLER_DEV
+	_require "$_CONF_FREEBSD_INSTALLER_DEV_NAME" _CONF_FREEBSD_INSTALLER_DEV_NAME
+
+	_require "$_CONF_FREEBSD_INSTALLER_SYSTEM_GIT" _CONF_FREEBSD_INSTALLER_SYSTEM_GIT
+	_require "$_CONF_FREEBSD_INSTALLER_SYSTEM_BRANCH" _CONF_FREEBSD_INSTALLER_SYSTEM_BRANCH
+	_require "$_CONF_FREEBSD_INSTALLER_PACKAGE_CACHE" _CONF_FREEBSD_INSTALLER_PACKAGE_CACHE
+
+	ifconfig $_CONF_FREEBSD_INSTALLER_NET 2>&1 >/dev/null
+	[ "$?" -gt "0" ] && _error "$_CONF_FREEBSD_INSTALLER_NET does not appear to exist"
+
+	local incorrect_prefix=$(printf '%s' "$_CONF_FREEBSD_INSTALLER_DEV_NAME" | grep -c ^z_)
+	[ "$incorrect_prefix" -gt "0" ] && _CONF_FREEBSD_INSTALLER_DEV_NAME=$(printf '%s' "$_CONF_FREEBSD_INSTALLER_DEV_NAME" | sed -e "s/^z_//")
+}
+
+_get_geli_password() {
+	printf '\n\n'
+
+	while [ 1 ]; do
+		_read_ifs "Please enter GELI password" _CONF_FREEBSD_INSTALLER_GELI_PASSPHRASE
+		_read_ifs "Please re-enter GELI password" _CONFIRM_FREEBSD_INSTALLER_GELI_PASSPHRASE
+
+		_require "$_CONF_FREEBSD_INSTALLER_GELI_PASSPHRASE" _CONF_FREEBSD_INSTALLER_GELI_PASSPHRASE
+
+		if [ "$_CONFIRM_FREEBSD_INSTALLER_GELI_PASSPHRASE" = "$_CONF_FREEBSD_INSTALLER_GELI_PASSPHRASE" ]; then
+			break
+		fi
+	done
+}
