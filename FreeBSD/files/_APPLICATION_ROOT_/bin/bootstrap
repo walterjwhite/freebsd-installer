@@ -1,0 +1,31 @@
+#!/bin/sh
+
+import bootstrap
+
+_set_logfile $_CONF_FREEBSD_INSTALLER_LOG_DIRECTORY/bootstrap.log
+
+_ENVIRONMENT_FILE=$_APPLICATION_PIPE_DIR/environment-bootstrap-$(date +%s) _environment_dump
+
+_module_run_modules setup swap packages microcode update hostname git geli
+
+_module_run_modules build zfs &
+_ZFS_PID=$!
+
+_module_run_modules build kernel &
+_KERNEL_PID=$!
+
+_module_run_modules build download &
+_DOWNLOADS_PID=$!
+
+_module_run_modules build package npm boot_loader sysctl rc periodic file link fstab cups_printer
+
+_set_logfile $_CONF_FREEBSD_INSTALLER_LOG_DIRECTORY/bootstrap.log
+
+_info "Waiting for ZFS ($_ZFS_PID) Kernel ($_KERNEL_PID) Downloads ($_DOWNLOADS_PID)"
+wait $_ZFS_PID $_KERNEL_PID $_DOWNLOADS_PID
+unset _KERNEL_PID _DOWNLOADS_PID _ZFS_PID
+
+
+_module_run_modules build group user app go rust pypi chown chmod run jail crontab post_run
+
+_post_install

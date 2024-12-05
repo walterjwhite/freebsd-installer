@@ -1,8 +1,0 @@
-#!/bin/sh
-
-./helpers/install/files/all \
-	|/usr/local/bin/grep -Pv "(^$|^#)"\
-	|sed -e "s/^.*files//"\
-	|/usr/local/bin/grep -Pv "^\/usr\/local\/(bin|sbin)"\
-	|sort -u\
-	|less

@@ -1,0 +1,28 @@
+#!/bin/sh
+
+import git:install/install/pkg.sh
+import bsdinstall
+
+ZFSBOOT_GELI_KEY_FILE=/boot/encryption.key
+ZFSBOOT_CONFIRM_LAYOUT=0
+
+_set_logfile /tmp/_bsdinstall.log
+
+
+printf '\n\n'
+_info "Installing FreeBSD $(uname -r) (walterjwhite)"
+
+_cleanup_prior_installation
+
+_setup_dev_name_using_map
+
+_cli
+_get_geli_password
+_net
+_ssh_keys
+_setup
+
+_setup_ssh_package_cache
+
+_ENVIRONMENT_FILE=$_APPLICATION_PIPE_DIR/environment-pre-bsdinstall-$(date +%s) _environment_dump
+bsdinstall script.walterjwhite $_INSTALLATION_SCRIPT $_CONF_INSTALL_LIBRARY_PATH/$_APPLICATION_NAME/bin/bootstrap

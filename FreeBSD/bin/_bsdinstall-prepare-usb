@@ -1,0 +1,51 @@
+#!/bin/sh
+
+import prepare
+import git:install/file.sh
+
+if [ $# -lt 1 ]; then
+	_DEVICE=da0
+else
+	_DEVICE=$1
+	shift
+fi
+
+_prepare_usb_mount() {
+	_MOUNT_POINT=/mnt/usb
+
+	mkdir -p $_MOUNT_POINT
+	mount $_DEVICE_PATH $_MOUNT_POINT && _defer _prepare_usb_on_exit
+}
+
+_prepare_usb_on_exit() {
+	umount $_MOUNT_POINT
+}
+
+_DEVICE_PATH=/dev/${_DEVICE}s2a
+
+_require_file "$_DEVICE_PATH"
+
+_prepare_usb_mount
+
+_copy_conf
+_install_ssh_keys
+
+_ROOT=$_MOUNT_POINT
+
+_CONF_INSTALL_STEP_TIMEOUT=$_CONF_FREEBSD_INSTALLER_APP_INSTALL_TIMEOUT _INSTALL_UPDATES_DISABLED=1 app-install install
+_CONF_INSTALL_STEP_TIMEOUT=$_CONF_FREEBSD_INSTALLER_APP_INSTALL_TIMEOUT _INSTALL_UPDATES_DISABLED=1 app-install freebsd-installer
+
+_enable_sshd
+
+cp $_ROOT/usr/local/bin/rc.local $_ROOT/etc/rc.local
+
+mkdir -p $_ROOT/var/cache/pkg
+
+grep -cq fusefs_load $_ROOT/boot/loader.conf || printf 'fusefs_load="YES"\n\n' >>$_ROOT/boot/loader.conf
+
+
+unset _ROOT
+
+zfs-zap-maintenance daily
+
+_success "Updated USB, it is safe to remove"

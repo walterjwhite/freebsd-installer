@@ -1,7 +1,0 @@
-#!/bin/sh
-
-_LOG_LINE_CHARACTER='-'
-_LOG_LINE_REPEAT=50
-_log() {
-  printf ${_LOG_LINE_CHARACTER}%.0s {1..${_LOG_LINE_REPEAT}}
-}
