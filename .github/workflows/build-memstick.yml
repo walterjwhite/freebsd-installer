@@ -55,7 +55,7 @@ jobs:
       # so the large file is never transferred over SSH.
       # The VM can still access /tmp on the Linux host via the virtfs share
       # that cross-platform-actions sets up at the same path.
-      @v1.2.0 is intact as its dependencies are handled internally
+      # @v1.2.0 is intact as its dependencies are handled internally
       - name: Set up FreeBSD VM
         uses: cross-platform-actions/action@v1.2.0
         with:
