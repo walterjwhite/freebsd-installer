@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  debug: "false"
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -102,11 +105,13 @@ jobs:
             -o /usr/local/bin/app-install
           sudo chmod +x /usr/local/bin/app-install
 
+          [ "$debug" = "true" ] && conf_log_level=0
+
           # install install in container image so we have dependencies installed
-          sudo /usr/local/bin/app-install -conf-log-level=0 install
+          sudo /usr/local/bin/app-install install
           
           # Run app-install targeting the mounted UFS root
-          sudo env APP_PLATFORM_ROOT=/mnt /usr/local/bin/app-install -conf-log-level=0 install os-installer
+          sudo env APP_PLATFORM_ROOT=/mnt /usr/local/bin/app-install install os-installer
 
           # Increase tmpfs size for the installer environment at boot
           sudo sed -i '' \
