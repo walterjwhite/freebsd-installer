@@ -7,6 +7,8 @@ on:
 
 env:
   debug: "false"
+  # Opt-in to Node.js 24 runtime to resolve runner deprecation warnings
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
   build:
@@ -16,9 +18,10 @@ jobs:
       - uses: actions/checkout@v6
 
       # Cache the compressed .xz — never modified, safe to reuse across runs
+      # Upgraded from v4 to v5 for Node.js 24 compatibility
       - name: Cache FreeBSD memstick image
         id: cache-memstick
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /tmp/FreeBSD-15.0-RELEASE-amd64-memstick.img.xz
           key: FreeBSD-15.0-RELEASE-amd64-memstick-xz
@@ -52,6 +55,7 @@ jobs:
       # so the large file is never transferred over SSH.
       # The VM can still access /tmp on the Linux host via the virtfs share
       # that cross-platform-actions sets up at the same path.
+      @v1.2.0 is intact as its dependencies are handled internally
       - name: Set up FreeBSD VM
         uses: cross-platform-actions/action@v1.2.0
         with:
@@ -133,6 +137,7 @@ jobs:
           mv img-build/custom-FreeBSD-15.0-RELEASE-amd64-memstick.img.xz \
              custom-FreeBSD-15.0-RELEASE-amd64-memstick.img.xz
 
+      # Upgraded from v4 to v5 for Node.js 24 compatibility
       - uses: actions/upload-artifact@v4
         with:
           name: freebsd-15-custom-memstick
