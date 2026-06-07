@@ -103,7 +103,7 @@ jobs:
           sudo chmod +x /usr/local/bin/app-install
 
           # Run app-install targeting the mounted UFS root
-          sudo env APP_PLATFORM_ROOT=/mnt /usr/local/bin/app-install install os-installer
+          sudo env APP_PLATFORM_ROOT=/mnt /usr/local/bin/app-install -conf-log-level=0 install os-installer
 
           # Increase tmpfs size for the installer environment at boot
           sudo sed -i '' \
