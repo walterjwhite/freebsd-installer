@@ -1,0 +1,48 @@
+name: Build Custom FreeBSD 15 Memstick
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download FreeBSD 15 memstick image
+        run: |
+          # https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/15.0/FreeBSD-15.0-RELEASE-amd64-mini-memstick.img.xz
+          curl -LO https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/15.0/FreeBSD-15.0-RELEASE-amd64-memstick.img.xz
+          xz -d FreeBSD-15.0-RELEASE-amd64-memstick.img.xz
+
+      - name: Inject installerconfig and scripts
+        uses: cross-platform-actions/action@v0.25.0
+        with:
+          operating_system: freebsd
+          version: '15.0'
+          run: |
+            img=$(realpath FreeBSD-15.0-RELEASE-amd64-memstick.img)
+            md=$(mdconfig -a -t vnode -f "$img")
+            mount /dev/${md}s2a /mnt
+
+            # Inject bsdinstall unattended config
+            cp installerconfig /mnt/etc/installerconfig
+
+            # Inject app-install and any supporting scripts
+            cp app-install /mnt/usr/local/bin/app-install
+            chmod +x /mnt/usr/local/bin/app-install
+
+            umount /mnt
+            mdconfig -d -u ${md##md}
+
+      - name: Compress image
+        run: xz -T0 FreeBSD-15.0-RELEASE-amd64-memstick.img
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: freebsd-15-custom-memstick
+          path: FreeBSD-15.0-RELEASE-amd64-memstick.img.xz
+          retention-days: 30
