@@ -143,3 +143,4 @@ jobs:
           name: freebsd-15-custom-memstick
           path: custom-FreeBSD-15.0-RELEASE-amd64-memstick.img.xz
           retention-days: 30
+          compression-level: 0 # Blocks redundant compression of the xz file
