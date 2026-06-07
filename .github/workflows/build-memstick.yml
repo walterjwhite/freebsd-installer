@@ -10,39 +10,123 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Download FreeBSD 15 memstick image
+      # Cache the compressed .xz — never modified, safe to reuse across runs
+      - name: Cache FreeBSD memstick image
+        id: cache-memstick
+        uses: actions/cache@v4
+        with:
+          path: /tmp/FreeBSD-15.0-RELEASE-amd64-memstick.img.xz
+          key: FreeBSD-15.0-RELEASE-amd64-memstick-xz
+
+      - name: Download FreeBSD memstick image
+        if: steps.cache-memstick.outputs.cache-hit != 'true'
         run: |
-          # https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/15.0/FreeBSD-15.0-RELEASE-amd64-mini-memstick.img.xz
-          curl -LO https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/15.0/FreeBSD-15.0-RELEASE-amd64-memstick.img.xz
-          xz -d FreeBSD-15.0-RELEASE-amd64-memstick.img.xz
+          curl -L \
+            https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/15.0/FreeBSD-15.0-RELEASE-amd64-memstick.img.xz \
+            -o /tmp/FreeBSD-15.0-RELEASE-amd64-memstick.img.xz
 
-      - name: Inject installerconfig and scripts
-        uses: cross-platform-actions/action@v0.25.0
+      # -k keeps the .xz so the cache file stays intact for next run
+      # Keep the initial source xz in /tmp so it isn't tracked by workspace rsync
+      - name: Decompress, copy and expand image
+        run: |
+          xz -dk /tmp/FreeBSD-15.0-RELEASE-amd64-memstick.img.xz
+          
+          mkdir -p img-build
+          cp /tmp/FreeBSD-15.0-RELEASE-amd64-memstick.img \
+             img-build/custom-FreeBSD-15.0-RELEASE-amd64-memstick.img
+
+          # Append 2GB of space
+          dd if=/dev/zero bs=1M count=2048 >> img-build/custom-FreeBSD-15.0-RELEASE-amd64-memstick.img
+
+          # Expand partition 2 to fill new space
+          sudo apt-get install -y cloud-guest-utils
+          sudo growpart img-build/custom-FreeBSD-15.0-RELEASE-amd64-memstick.img 2
+
+      # sync_files: true (default) — workspace syncs into VM normally.
+      # The image lives in /tmp which is NOT part of the workspace rsync,
+      # so the large file is never transferred over SSH.
+      # The VM can still access /tmp on the Linux host via the virtfs share
+      # that cross-platform-actions sets up at the same path.
+      - name: Set up FreeBSD VM
+        uses: cross-platform-actions/action@v1.2.0
         with:
           operating_system: freebsd
+          architecture: x86-64
           version: '15.0'
-          run: |
-            img=$(realpath FreeBSD-15.0-RELEASE-amd64-memstick.img)
-            md=$(mdconfig -a -t vnode -f "$img")
-            mount /dev/${md}s2a /mnt
+        
+          # This prevents rsync performance overhead while keeping files accessible
+          sync_files: "runner-to-vm"
 
-            # Inject bsdinstall unattended config
-            cp installerconfig /mnt/etc/installerconfig
+      - name: Inject scripts into image
+        shell: cpa.sh {0}
+        run: |
+          img=img-build/custom-FreeBSD-15.0-RELEASE-amd64-memstick.img
 
-            # Inject app-install and any supporting scripts
-            cp app-install /mnt/usr/local/bin/app-install
-            chmod +x /mnt/usr/local/bin/app-install
+          # Verify the image is accessible and check its size
+          ls -lh "$img"
 
-            umount /mnt
-            mdconfig -d -u ${md##md}
+          # Create the memory disk device and capture its name (e.g., md0)
+          md=$(sudo mdconfig -a -t vnode -f "$img")
+          echo "Attached image as loopback device: $md"
 
+          # 1. Recover the disk geometry to recognize the trailing space appended by dd
+          sudo gpart recover "$md"
+
+          # 2. Resize the outer MBR slice (partition 2) to fill the disk
+          sudo gpart resize -i 2 "$md"
+
+          # 3. Resize the inner BSD partition 'a' inside the slice
+          sudo gpart resize -i 1 "${md}s2"
+
+          # 4. Now grow the UFS filesystem
+          sudo growfs -y /dev/${md}s2a
+
+          # 5. Mount the expanded volume
+          sudo mount /dev/${md}s2a /mnt
+          
+          df -h /mnt
+
+          # Redirect pkg cache to VM's own tmpfs so packages don't
+          # consume space in the target UFS volume
+          sudo mkdir -p /var/cache/pkg /mnt/var/cache/pkg
+          sudo mount -t nullfs /var/cache/pkg /mnt/var/cache/pkg
+
+          # Also mount devfs so pkg post-install scripts work
+          sudo mount -t devfs devfs /mnt/dev
+
+          # Fetch app-install into the live VM
+          sudo curl -sSL \
+            https://raw.githubusercontent.com/walterjwhite/app-registry/refs/heads/main/install/FreeBSD/setup/bin/app-install \
+            -o /usr/local/bin/app-install
+          sudo chmod +x /usr/local/bin/app-install
+
+          # Run app-install targeting the mounted UFS root
+          sudo env APP_PLATFORM_ROOT=/mnt /usr/local/bin/app-install install os-installer
+
+          # Increase tmpfs size for the installer environment at boot
+          sudo sed -i '' \
+            's|tmpfs.*[[:space:]]/tmp.*tmpfs.*|tmpfs /tmp tmpfs rw,size=1g 0 0|' \
+            /mnt/etc/fstab
+
+          # Clean up mounts in reverse order
+          sudo umount /mnt/dev
+          sudo umount /mnt/var/cache/pkg
+          sudo umount /mnt
+          
+          # Detach the memory disk device using the active unit number
+          sudo mdconfig -d -u "${md##md}"
+
+      # Move compressed artifact back into workspace root for upload
       - name: Compress image
-        run: xz -T0 FreeBSD-15.0-RELEASE-amd64-memstick.img
+        run: |
+          xz -T0 img-build/custom-FreeBSD-15.0-RELEASE-amd64-memstick.img
+          mv img-build/custom-FreeBSD-15.0-RELEASE-amd64-memstick.img.xz \
+             custom-FreeBSD-15.0-RELEASE-amd64-memstick.img.xz
 
       - uses: actions/upload-artifact@v4
         with:
           name: freebsd-15-custom-memstick
-          path: FreeBSD-15.0-RELEASE-amd64-memstick.img.xz
+          path: custom-FreeBSD-15.0-RELEASE-amd64-memstick.img.xz
           retention-days: 30
