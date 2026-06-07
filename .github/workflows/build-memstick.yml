@@ -102,6 +102,9 @@ jobs:
             -o /usr/local/bin/app-install
           sudo chmod +x /usr/local/bin/app-install
 
+          # install install in container image so we have dependencies installed
+          sudo /usr/local/bin/app-install -conf-log-level=0 install
+          
           # Run app-install targeting the mounted UFS root
           sudo env APP_PLATFORM_ROOT=/mnt /usr/local/bin/app-install -conf-log-level=0 install os-installer
 
