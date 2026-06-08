@@ -4,9 +4,14 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Log level'
+        required: true
+        default: 'false'
+        type: boolean
 
 env:
-  debug: "false"
   # Opt-in to Node.js 24 runtime to resolve runner deprecation warnings
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
@@ -123,7 +128,7 @@ jobs:
           #  's|tmpfs.*[[:space:]]/tmp.*tmpfs.*|tmpfs /tmp tmpfs rw,size=1g 0 0|' \
           #  /mnt/etc/fstab
 
-          # verify packages were actually installed
+          # verify packages were actually installed (nothing returned, these must not be installed)
           sudo find /mnt -type f \( -name shuf -o -name sshfs -o -name ggrep -o -name sudo -o -name gawk \)
 
           # Clean up mounts in reverse order
