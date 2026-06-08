@@ -8,13 +8,13 @@ on:
       debug:
         description: 'debug'
         required: true
-        default: 'false'
+        default: false
         type: boolean
 
 env:
-  # Opt-in to Node.js 24 runtime to resolve runner deprecation warnings
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-  conf_log_level: ${{ github.event.inputs.debug == 'true' && '0' || '1' }}
+  # Check the boolean directly without quotes
+  conf_log_level: ${{ inputs.debug == true && '0' || '1' }}
 
 jobs:
   build:
