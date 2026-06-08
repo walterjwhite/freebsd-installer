@@ -117,10 +117,14 @@ jobs:
           # Run app-install targeting the mounted UFS root
           sudo env APP_PLATFORM_ROOT=/mnt /usr/local/bin/app-install install os-installer
 
+          # NOTE: the tmpfs size is not set here
           # Increase tmpfs size for the installer environment at boot
-          sudo sed -i '' \
-            's|tmpfs.*[[:space:]]/tmp.*tmpfs.*|tmpfs /tmp tmpfs rw,size=1g 0 0|' \
-            /mnt/etc/fstab
+          #sudo sed -i '' \
+          #  's|tmpfs.*[[:space:]]/tmp.*tmpfs.*|tmpfs /tmp tmpfs rw,size=1g 0 0|' \
+          #  /mnt/etc/fstab
+
+          # verify packages were actually installed
+          find /mnt -type f \( -name shuf -o -name sshfs -o -name ggrep -o -name sudo -o -name gawk\)
 
           # Clean up mounts in reverse order
           sudo umount /mnt/dev
