@@ -124,7 +124,7 @@ jobs:
           #  /mnt/etc/fstab
 
           # verify packages were actually installed
-          find /mnt -type f \( -name shuf -o -name sshfs -o -name ggrep -o -name sudo -o -name gawk \)
+          sudo find /mnt -type f \( -name shuf -o -name sshfs -o -name ggrep -o -name sudo -o -name gawk \)
 
           # Clean up mounts in reverse order
           sudo umount /mnt/dev
