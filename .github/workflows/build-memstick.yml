@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       debug:
-        description: 'Log level'
+        description: 'debug'
         required: true
         default: 'false'
         type: boolean
