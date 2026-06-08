@@ -118,10 +118,10 @@ jobs:
           sudo chmod +x /usr/local/bin/app-install
 
           # install install in container image so we have dependencies installed
-          sudo /usr/local/bin/app-install install
+          sudo env conf_log_level=$conf_log_level /usr/local/bin/app-install install
           
           # Run app-install targeting the mounted UFS root
-          sudo env APP_PLATFORM_ROOT=/mnt /usr/local/bin/app-install install os-installer
+          sudo env APP_PLATFORM_ROOT=/mnt conf_log_level=$conf_log_level /usr/local/bin/app-install install os-installer
 
           # NOTE: the tmpfs size is not set here
           # Increase tmpfs size for the installer environment at boot
