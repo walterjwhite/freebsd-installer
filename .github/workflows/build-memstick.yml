@@ -135,6 +135,10 @@ jobs:
 
           sudo mkdir -p /mnt/mnt/os /mnt/var/cache/pkg
 
+          # configure DHCP on all interfaces
+          printf '\n\n# use DHCP by default\nifconfig_DEFAULT="DHCP"\n' | sudo tee -a /mnt/etc/rc.conf
+          printf 'background_dhcp="YES"\n' | sudo tee -a /mnt/etc/rc.conf
+
           # load fusefs
           printf '\n\n# prepare-install-media - sshfs-fuse\nfusefs_load="YES"\n\n' | sudo tee -a /mnt/boot/loader.conf
 
