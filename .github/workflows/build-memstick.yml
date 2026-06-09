@@ -101,21 +101,25 @@ jobs:
           # 5. Mount the expanded volume
           sudo mount /dev/${md}s2a /mnt
           
-          df -h /mnt
+          # make a file listing of /usr/local/bin
+          find /mnt/usr/local/bin -type f
 
           # Redirect pkg cache to VM's own tmpfs so packages don't
           # consume space in the target UFS volume
           sudo mkdir -p /var/cache/pkg /mnt/var/cache/pkg
           sudo mount -t nullfs /var/cache/pkg /mnt/var/cache/pkg
+          sudo mount -t nullfs /tmp /mnt/tmp
 
           # Also mount devfs so pkg post-install scripts work
           sudo mount -t devfs devfs /mnt/dev
 
           # Fetch app-install into the live VM
-          sudo curl -sSL \
+          curl -sSL \
             https://raw.githubusercontent.com/walterjwhite/app-registry/refs/heads/main/install/FreeBSD/setup/bin/app-install \
-            -o /usr/local/bin/app-install
-          sudo chmod +x /usr/local/bin/app-install
+            -o /tmp/app-install
+          chmod +x /tmp/app-install
+
+          sudo mv /tmp/app-install /usr/local/bin
 
           # explicitly set log level
           export conf_log_level=0
@@ -126,17 +130,13 @@ jobs:
           # Run app-install targeting the mounted UFS root
           sudo env APP_PLATFORM_ROOT=/mnt conf_log_level=$conf_log_level /usr/local/bin/app-install install os-installer
 
-          # NOTE: the tmpfs size is not set here
-          # Increase tmpfs size for the installer environment at boot
-          #sudo sed -i '' \
-          #  's|tmpfs.*[[:space:]]/tmp.*tmpfs.*|tmpfs /tmp tmpfs rw,size=1g 0 0|' \
-          #  /mnt/etc/fstab
-
-          # verify packages were actually installed (nothing returned, these must not be installed)
-          sudo find /mnt -type f \( -name shuf -o -name sshfs -o -name ggrep -o -name sudo -o -name gawk \)
+          # make a file listing of /usr/local/bin
+          find /mnt/usr/local/bin -type f
+          
 
           # Clean up mounts in reverse order
           sudo umount /mnt/dev
+          sudo umount /mnt/tmp
           sudo umount /mnt/var/cache/pkg
           sudo umount /mnt
           
