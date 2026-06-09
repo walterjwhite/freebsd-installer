@@ -132,6 +132,14 @@ jobs:
 
           # make a file listing of /usr/local/bin
           sudo find /mnt -type f || true
+
+          sudo mkdir -p /mnt/mnt/os /mnt/var/cache/pkg
+
+          # load fusefs
+          sudo printf '# prepare-install-media - sshfs-fuse\nfusefs_load="YES"\n\n' >>/mnt/boot/loader.conf
+
+          # use tmpfs for /root/.data
+          sudo printf '# prepare-install-media - use tmpfs for /root/.data\ntmpfs /root/.data tmpfs rw,mode=1777 0 0\n' >>/mnt/etc/fstab
           
 
           # Clean up mounts in reverse order
