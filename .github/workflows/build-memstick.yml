@@ -150,7 +150,7 @@ jobs:
           COMMIT_DATE="${{ github.event.head_commit.timestamp }}"
 
           sudo mkdir -p /usr/local/etc/walterjwhite
-          printf '%s\n%s\n' "$COMMIT_HASH" "$COMMIT_DATE" | tee /mnt/usr/local/etc/walterjwhite/system
+          printf '%s\n%s\n' "$COMMIT_HASH" "$COMMIT_DATE" | sudo tee /mnt/usr/local/etc/walterjwhite/system
           
 
           # Clean up mounts in reverse order
