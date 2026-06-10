@@ -144,6 +144,13 @@ jobs:
 
           # use tmpfs for /root/.data
           printf '\n\n# prepare-install-media - use tmpfs for /root/.data\ntmpfs /root/.data tmpfs rw,mode=1777 0 0\n' | sudo tee -a /mnt/etc/fstab
+
+          # embed build information
+          COMMIT_HASH="${{ github.sha }}"
+          COMMIT_DATE="${{ github.event.head_commit.timestamp }}"
+
+          sudo mkdir -p /usr/local/etc/walterjwhite
+          printf '%s\n%s\n' "$COMMIT_HASH" "$COMMIT_DATE" | tee /mnt/usr/local/etc/walterjwhite/system
           
 
           # Clean up mounts in reverse order
