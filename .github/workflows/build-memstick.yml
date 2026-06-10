@@ -27,14 +27,14 @@ jobs:
 
       # Cache the compressed .xz — never modified, safe to reuse across runs
       # Upgraded from v4 to v5 for Node.js 24 compatibility
-      - name: Cache FreeBSD memstick image
+      - name: cache FreeBSD memstick image
         id: cache-memstick
         uses: actions/cache@v5
         with:
           path: /tmp/FreeBSD-15.0-RELEASE-amd64-mini-memstick.img.xz
           key: FreeBSD-15.0-RELEASE-amd64-mini-memstick-xz
 
-      - name: Download FreeBSD memstick image
+      - name: download FreeBSD memstick image
         if: steps.cache-memstick.outputs.cache-hit != 'true'
         run: |
           curl -L \
@@ -43,7 +43,7 @@ jobs:
 
       # -k keeps the .xz so the cache file stays intact for next run
       # Keep the initial source xz in /tmp so it isn't tracked by workspace rsync
-      - name: Decompress, copy and expand image
+      - name: decompress, copy and expand image
         run: |
           xz -dk /tmp/FreeBSD-15.0-RELEASE-amd64-mini-memstick.img.xz
           
@@ -64,7 +64,7 @@ jobs:
       # The VM can still access /tmp on the Linux host via the virtfs share
       # that cross-platform-actions sets up at the same path.
       # @v1.2.0 is intact as its dependencies are handled internally
-      - name: Set up FreeBSD VM
+      - name: set up FreeBSD VM
         uses: cross-platform-actions/action@v1.2.0
         with:
           operating_system: freebsd
@@ -73,14 +73,14 @@ jobs:
         
           # This prevents rsync performance overhead while keeping files accessible
           sync_files: "runner-to-vm"
-
-      - name: Inject scripts into image
+      
+      - name: setup image
         shell: cpa.sh {0}
         run: |
           img=img-build/custom-FreeBSD-15.0-RELEASE-amd64-mini-memstick.img
 
           # Verify the image is accessible and check its size
-          ls -lh "$img"
+          #ls -lh "$img"
 
           # Create the memory disk device and capture its name (e.g., md0)
           md=$(sudo mdconfig -a -t vnode -f "$img")
@@ -102,7 +102,7 @@ jobs:
           sudo mount /dev/${md}s2a /mnt
           
           # make a file listing of /
-          sudo find /mnt -type f || true
+          #sudo find /mnt -type f || true
 
           # Redirect pkg cache to VM's own tmpfs so packages don't
           # consume space in the target UFS volume
@@ -113,6 +113,17 @@ jobs:
           # Also mount devfs so pkg post-install scripts work
           sudo mount -t devfs devfs /mnt/dev
 
+          # copy /etc/resolv.conf
+          sudo mkdir -p /mnt/tmp/bsdinstall_etc /tmp/bsdinstall_etc
+          sudo cp /etc/resolv.conf /mnt/tmp/bsdinstall_etc
+          sudo cp /etc/resolv.conf /tmp/bsdinstall_etc
+
+          # verify where the symlink is pointed
+          sudo ls -al /mnt/etc/resolv.conf
+
+      - name: add os-installer
+        shell: cpa.sh {0}
+        run: |
           # Fetch app-install into the live VM
           curl -sSL \
             https://raw.githubusercontent.com/walterjwhite/app-registry/refs/heads/main/install/FreeBSD/setup/bin/app-install \
@@ -129,9 +140,6 @@ jobs:
           
           # Run app-install targeting the mounted UFS root
           sudo env APP_PLATFORM_ROOT=/mnt conf_log_level=$conf_log_level /usr/local/bin/app-install install os-installer
-
-          # make a file listing of /usr/local/bin
-          #sudo find /mnt -type f || true
 
           sudo mkdir -p /mnt/mnt/os /mnt/var/cache/pkg
 
@@ -151,7 +159,12 @@ jobs:
 
           sudo mkdir -p /mnt/usr/local/etc/walterjwhite
           printf '%s\n%s\n' "$COMMIT_HASH" "$COMMIT_DATE" | sudo tee /mnt/usr/local/etc/walterjwhite/system
-          
+
+      - name: unmount
+        shell: cpa.sh {0}
+        run: |
+          # make a file listing of /usr/local/bin
+          #sudo find /mnt -type f || true
 
           # Clean up mounts in reverse order
           sudo umount /mnt/dev
@@ -163,7 +176,7 @@ jobs:
           sudo mdconfig -d -u "${md##md}"
 
       # Move compressed artifact back into workspace root for upload
-      - name: Compress image
+      - name: compress image
         run: |
           xz -T0 img-build/custom-FreeBSD-15.0-RELEASE-amd64-mini-memstick.img
           mv img-build/custom-FreeBSD-15.0-RELEASE-amd64-mini-memstick.img.xz \
